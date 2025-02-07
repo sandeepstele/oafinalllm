@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Fusion Model Results{% endblock %}
+{% block content %}
+<h1>Fusion Model Results</h1>
+
+<div class="fusion-results">
+  <h2>Predictions and Clinical Data</h2>
+  <div>
+    {{ fusion_result|safe }}
+  </div>
+</div>
+
+<div class="patient-report">
+  <h2>Patient Report</h2>
+  <!-- Convert newlines to <br> and apply our custom markdown filter for bold text -->
+  <p>{{ patient_report|replace("\n", "<br>")|markdown_to_html|safe }}</p>
+</div>
+
+<a href="{{ url_for('fusion') }}" class="btn btn-secondary mt-3">Back to Input</a>
+{% endblock %}

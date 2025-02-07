@@ -124,3 +124,16 @@ body {
   border-top: 1px solid #dee2e6;
   background-color: #e9ecef;
 }
+.fusion-results, .patient-report {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+.patient-report h2 {
+  color: #2c3e50;
+}
