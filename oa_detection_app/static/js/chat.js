@@ -22,18 +22,50 @@ document.addEventListener('DOMContentLoaded', function () {
       chatBox.style.display = 'none';
   });
 
-  // Send message function
-  function sendMessage() {
+  // Function to append a message to the chat body
+  function appendMessage(sender, text, alignment) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add(alignment, 'mb-2');
+      msgDiv.textContent = `${sender}: ${text}`;
+      chatBody.appendChild(msgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll
+  }
+
+  // Send message function using fetch to call the Flask /chat endpoint
+  async function sendMessage() {
       const message = chatInput.value.trim();
       if (message === '') return;
 
+      // Append user's message
       appendMessage("You", message, "text-right");
-
       chatInput.value = '';
       chatInput.focus();
 
-      // Simulate bot response or integrate OpenAI API here
-      setTimeout(() => getBotResponse(message), 500);
+      try {
+          // Prepare form data
+          const formData = new FormData();
+          formData.append('message', message);
+
+          // Make a POST request to /chat with the custom header to indicate AJAX
+          const response = await fetch('/chat', {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+              }
+          });
+
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          // Expect a JSON response in the format: { "response": "..." }
+          const data = await response.json();
+          appendMessage("Bot", data.response, "text-left");
+      } catch (error) {
+          console.error("Error sending message:", error);
+          appendMessage("Bot", "There was an error processing your message.", "text-left");
+      }
   }
 
   // Listen for send button click
@@ -46,27 +78,4 @@ document.addEventListener('DOMContentLoaded', function () {
           sendMessage();
       }
   });
-
-  // Function to append a message
-  function appendMessage(sender, text, alignment) {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add(alignment, 'mb-2');
-      msgDiv.textContent = `${sender}: ${text}`;
-      chatBody.appendChild(msgDiv);
-      chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll
-  }
-
-  // Simulated AI Bot response function (Replace with OpenAI API call)
-  function getBotResponse(userMessage) {
-      const botResponses = {
-          "hello": "Hi there! How can I assist you?",
-          "how are you": "I'm just a bot, but I'm doing great!",
-          "bye": "Goodbye! Have a great day!",
-      };
-
-      // Check predefined responses or provide a generic one
-      const response = botResponses[userMessage.toLowerCase()] || "I'm here to help!";
-      
-      appendMessage("Bot", response, "text-left");
-  }
 });
