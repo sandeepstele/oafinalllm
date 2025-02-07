@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Late Fusion Model Page{% endblock %}
+{% block content %}
+<h1>Late Fusion Model</h1>
+<p>This page allows you to run the Late Fusion prediction pipeline.</p>
+<form method="POST" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="image_file">Upload X-ray Image:</label>
+    <input type="file" class="form-control-file" id="image_file" name="image_file" required>
+  </div>
+  <div class="form-group">
+    <label>Select Model Type:</label><br>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="model_type" id="model_multi" value="multi" checked>
+      <label class="form-check-label" for="model_multi">Multi-class (KL Score)</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="model_type" id="model_binary" value="binary">
+      <label class="form-check-label" for="model_binary">Binary Detection</label>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% if result %}
+<div class="alert alert-info mt-4">
+  <strong>Result:</strong> {{ result }}
+</div>
+{% endif %}
+{% endblock %}

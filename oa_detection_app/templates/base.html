@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OA Detection App{% endblock %}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="d-flex" id="wrapper">
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="sidebar-heading">OA App</div>
+      <div class="list-group list-group-flush">
+        <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action bg-light">Home</a>
+        <a href="{{ url_for('clinical') }}" class="list-group-item list-group-item-action bg-light">Clinical</a>
+        <a href="{{ url_for('xray') }}" class="list-group-item list-group-item-action bg-light">X-ray</a>
+        <a href="{{ url_for('fusion') }}" class="list-group-item list-group-item-action bg-light">Late Fusion</a>
+      </div>
+      <!-- AI Bot Button -->
+      <button id="aiBotBtn" class="btn btn-primary m-3">AI Bot</button>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <button class="btn btn-secondary" id="menu-toggle">Toggle Menu</button>
+      </nav>
+      <div class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+  </div>
+  <!-- AI Chat Box (hidden by default) -->
+  <div id="chatBox" class="chat-box">
+    <div class="chat-header">
+      <span>AI Chat Bot</span>
+      <button id="closeChat" class="btn btn-sm btn-danger">X</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <!-- Chat messages will appear here -->
+    </div>
+    <div class="chat-footer">
+      <input type="text" id="chatInput" class="form-control" placeholder="Type your message...">
+      <button id="sendChat" class="btn btn-primary mt-2">Send</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+  <script>
+    // Toggle sidebar menu
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+</body>
+</html>

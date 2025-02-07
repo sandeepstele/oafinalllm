@@ -1,0 +1,88 @@
+/* Basic styles for sidebar and chat box */
+body {
+  overflow-x: hidden;
+}
+
+#wrapper {
+  display: flex;
+}
+
+/* Sidebar styles */
+#sidebar-wrapper {
+  min-height: 100vh;
+  width: 250px;
+  background: #f8f9fa;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+/* Hide sidebar when toggled */
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: -250px;
+}
+
+/* Content wrapper shifts when sidebar toggles */
+#page-content-wrapper {
+  width: 100%;
+  margin-left: 250px;
+  transition: all 0.3s ease;
+}
+
+/* Shift back when sidebar is hidden */
+#wrapper.toggled #page-content-wrapper {
+  margin-left: 0;
+}
+
+/* Sidebar menu styling */
+.sidebar-nav {
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-nav li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sidebar-nav li a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+
+.sidebar-nav li a:hover {
+  background: #007bff;
+  color: white;
+}
+
+/* Chat box styling (Fixed so it is not affected by sidebar toggle) */
+.chat-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+}
+.chat-header {
+  background: #007bff;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.chat-body {
+  height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.chat-footer {
+  padding: 10px;
+}

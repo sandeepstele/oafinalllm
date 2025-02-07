@@ -1,0 +1,27 @@
+# Core AI & OpenAI Integration
+openai
+tiktoken  # Tokenization for OpenAI models
+
+# Retrieval-Augmented Generation (RAG) Dependencies
+langchain  # Framework for RAG & LLMs
+chromadb  # Vector database for storing embeddings
+faiss-cpu  # Alternative vector database for efficient retrieval
+sentence-transformers  # Embeddings for retrieval
+
+# Web Scraping & Data Processing (If needed for RAG)
+beautifulsoup4  # Parsing HTML for document retrieval
+requests  # HTTP requests for fetching documents
+
+# General Utilities
+numpy  # Array and numerical operations
+pandas  # Data handling & processing
+torch  # PyTorch for model integration
+transformers  # Hugging Face transformers for embeddings
+
+# Optional: Flask or FastAPI (If you need an API)
+flask  # Lightweight API framework
+fastapi  # Modern API framework (alternative to Flask)
+uvicorn  # ASGI server for FastAPI
+
+# Optional: Streamlit (If you want a UI for interaction)
+streamlit  # Interactive web UI for AI applications
