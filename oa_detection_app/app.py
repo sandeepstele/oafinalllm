@@ -63,19 +63,50 @@ def preprocess_image_file(img_file):
 def index():
     return render_template('index.html')
 
-@app.route('/clinical')
+@app.route('/clinical', methods=['GET', 'POST'])
 def clinical():
-    return render_template('clinical.html')
-
-@app.route('/xray')
-def xray():
-    return render_template('xray.html')
-
-@app.route('/fusion', methods=['GET', 'POST'])
-def fusion():
+    # Create a dictionary of default values from default_sample_data
+    default_clinical_dict = dict(zip(clinical_columns, default_sample_data[0]))
     result_text = ""
     if request.method == 'POST':
-        model_type = request.form.get('model_type')
+        clinical_inputs = []
+        # Loop through each clinical parameter; use default if input is empty.
+        for col in clinical_columns:
+            value = request.form.get(col)
+            if value is None or value.strip() == '':
+                clinical_inputs.append(default_clinical_dict[col])
+            else:
+                try:
+                    clinical_inputs.append(float(value))
+                except ValueError:
+                    clinical_inputs.append(default_clinical_dict[col])
+        clinical_array = np.array([clinical_inputs])
+        processed_df = preprocess_clinical_data(clinical_array)
+        
+        # Generate prediction from clinical data using the XGBoost model.
+        clinical_prediction_proba = multi_xgb_model.predict_proba(processed_df.values)
+        final_label = np.argmax(clinical_prediction_proba, axis=1)[0]
+        if final_label == 0:
+            prediction_result = "Clinical Prediction: OA not detected (0)."
+        else:
+            prediction_result = f"Clinical Prediction: OA detected (1) with a KL score of {final_label}."
+            
+        result_text = (
+            "Processed Clinical Data:<br>" +
+            processed_df.to_html(classes="table table-bordered") +
+            "<br><br>" + prediction_result
+        )
+        
+        # Log the result to Flask logger and terminal.
+        app.logger.info("Clinical Data Processed: %s", result_text)
+        print("Clinical Data Processed:", result_text)
+        
+        return render_template('clinical.html', result=result_text, defaults=default_clinical_dict, columns=clinical_columns)
+    return render_template('clinical.html', defaults=default_clinical_dict, columns=clinical_columns)
+@app.route('/xray', methods=['GET', 'POST'])
+def xray():
+    result_text = ""
+    if request.method == 'POST':
         if 'image_file' not in request.files:
             flash("No image file provided.")
             return redirect(request.url)
@@ -83,36 +114,83 @@ def fusion():
         if file.filename == '':
             flash("No file selected.")
             return redirect(request.url)
-        # Preprocess image and clinical data
+        # Preprocess the uploaded image using our BytesIO-based function
         img_array = preprocess_image_file(file)
-        clinical_df = preprocess_clinical_data(default_sample_data)
-        
-        if model_type == 'multi':
-            predictions_tf = multi_tf_model.predict(img_array)
-            # Convert clinical_df to numpy array
-            xgb_probs = multi_xgb_model.predict_proba(clinical_df.values)
-            w1 = 0.6530612244897959
-            w2 = 0.34693877551020413
-            fused_probs = (w1 * predictions_tf) + (w2 * xgb_probs)
-            final_label = np.argmax(fused_probs, axis=1)[0]
-            if final_label == 0:
-                result_text = "Multi-class Prediction: OA not detected (0)."
-            else:
-                result_text = f"Multi-class Prediction: OA detected (1) with a KL score of {final_label}."
-        elif model_type == 'binary':
-            predictions_tf = binary_tf_model.predict(img_array)
-            xgb_probs = binary_xgb_model.predict_proba(clinical_df.values)
-            w1 = 0.4897959183673469
-            w2 = 0.5102040816326531
-            fused_probs = (w1 * predictions_tf) + (w2 * xgb_probs)
-            final_label = np.argmax(fused_probs, axis=1)[0]
-            result_text = f"Binary Prediction: OA Detection = {'Yes (1)' if final_label == 1 else 'No (0)'}."
+        # Use the x-ray model (using the multi_tf_model for image-only prediction)
+        predictions = multi_tf_model.predict(img_array)
+        predicted_class = np.argmax(predictions, axis=-1)[0]
+        # Interpret the prediction (assuming 0 means "OA not detected" and >0 means "OA detected with KL score")
+        if predicted_class == 0:
+            result_text = "X-ray Prediction: OA not detected (0)."
         else:
-            flash("Invalid model type selected.")
-            return redirect(request.url)
-        
-        return render_template('fusion.html', result=result_text)
-    return render_template('fusion.html')
+            result_text = f"X-ray Prediction: OA detected (1) with a KL score of {predicted_class}."
+        return render_template('xray.html', result=result_text)
+    return render_template('xray.html')
 
+
+@app.route('/fusion', methods=['GET', 'POST'])
+def fusion():
+    # Create a dictionary of default clinical values
+    default_clinical_dict = dict(zip(clinical_columns, default_sample_data[0]))
+    result_text = ""
+    if request.method == 'POST':
+        # Process clinical inputs: loop over each clinical parameter
+        clinical_inputs = []
+        for col in clinical_columns:
+            value = request.form.get(col)
+            if value is None or value.strip() == '':
+                clinical_inputs.append(default_clinical_dict[col])
+            else:
+                try:
+                    clinical_inputs.append(float(value))
+                except ValueError:
+                    clinical_inputs.append(default_clinical_dict[col])
+        clinical_array = np.array([clinical_inputs])
+        processed_df = preprocess_clinical_data(clinical_array)
+        
+        # Process the uploaded X-ray image
+        if 'image_file' not in request.files:
+            flash("No image file provided.")
+            return redirect(request.url)
+        file = request.files['image_file']
+        if file.filename == '':
+            flash("No file selected.")
+            return redirect(request.url)
+        img_array = preprocess_image_file(file)
+        
+        # --- Multi-class Prediction (interpreted as KL score) ---
+        predictions_tf_multi = multi_tf_model.predict(img_array)
+        xgb_probs_multi = multi_xgb_model.predict_proba(processed_df.values)
+        w1_multi = 0.6530612244897959
+        w2_multi = 0.34693877551020413
+        fused_probs_multi = (w1_multi * predictions_tf_multi) + (w2_multi * xgb_probs_multi)
+        final_label_multi = np.argmax(fused_probs_multi, axis=1)[0]
+        if final_label_multi == 0:
+            multi_result = "Multi-class Prediction: OA not detected (0)."
+        else:
+            multi_result = f"Multi-class Prediction: OA detected (1) with a KL score of {final_label_multi}."
+        
+        # --- Binary Prediction ---
+        predictions_tf_binary = binary_tf_model.predict(img_array)
+        xgb_probs_binary = binary_xgb_model.predict_proba(processed_df.values)
+        w1_binary = 0.4897959183673469
+        w2_binary = 0.5102040816326531
+        fused_probs_binary = (w1_binary * predictions_tf_binary) + (w2_binary * xgb_probs_binary)
+        final_label_binary = np.argmax(fused_probs_binary, axis=1)[0]
+        binary_result = f"Binary Prediction: OA Detection = {'Yes (1)' if final_label_binary == 1 else 'No (0)'}."
+        
+        # Combine the results with the processed clinical data table
+        result_text = (
+            "Processed Clinical Data:<br>" +
+            processed_df.to_html(classes="table table-bordered") +
+            "<br><br>" +
+            multi_result +
+            "<br>" +
+            binary_result
+        )
+        app.logger.info("Fusion result: %s", result_text)
+        print("Fusion result:", result_text)
+        return render_template('fusion.html', result=result_text, defaults=default_clinical_dict, columns=clinical_columns)
+    return render_template('fusion.html', defaults=default_clinical_dict, columns=clinical_columns)
 if __name__ == '__main__':
     app.run(debug=True)

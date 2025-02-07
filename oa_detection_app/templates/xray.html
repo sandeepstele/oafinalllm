@@ -3,5 +3,16 @@
 {% block content %}
 <h1>X-ray Model</h1>
 <p>This page is dedicated to the X-ray image prediction component.</p>
-<!-- Additional X-ray model content can be added here -->
+<form method="POST" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="image_file">Upload X-ray Image:</label>
+    <input type="file" class="form-control-file" id="image_file" name="image_file" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% if result %}
+<div class="alert alert-info mt-4">
+  <strong>Result:</strong> {{ result }}
+</div>
+{% endif %}
 {% endblock %}

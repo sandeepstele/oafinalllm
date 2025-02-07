@@ -2,28 +2,24 @@
 {% block title %}Late Fusion Model Page{% endblock %}
 {% block content %}
 <h1>Late Fusion Model</h1>
-<p>This page allows you to run the Late Fusion prediction pipeline.</p>
+<p>Please upload an X-ray image and input the clinical parameters below. If you leave any clinical field empty, the default value will be used.</p>
 <form method="POST" enctype="multipart/form-data">
   <div class="form-group">
     <label for="image_file">Upload X-ray Image:</label>
     <input type="file" class="form-control-file" id="image_file" name="image_file" required>
   </div>
+  <h3>Clinical Data:</h3>
+  {% for col in columns %}
   <div class="form-group">
-    <label>Select Model Type:</label><br>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="model_type" id="model_multi" value="multi" checked>
-      <label class="form-check-label" for="model_multi">Multi-class (KL Score)</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="model_type" id="model_binary" value="binary">
-      <label class="form-check-label" for="model_binary">Binary Detection</label>
-    </div>
+    <label for="{{ col }}">{{ col }}</label>
+    <input type="text" class="form-control" id="{{ col }}" name="{{ col }}" value="{{ defaults[col] }}">
   </div>
+  {% endfor %}
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 {% if result %}
-<div class="alert alert-info mt-4">
-  <strong>Result:</strong> {{ result }}
+<div class="mt-4">
+  {{ result|safe }}
 </div>
 {% endif %}
 {% endblock %}

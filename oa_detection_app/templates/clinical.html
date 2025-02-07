@@ -2,6 +2,19 @@
 {% block title %}Clinical Data Page{% endblock %}
 {% block content %}
 <h1>Clinical Data Model</h1>
-<p>This page is dedicated to the clinical data prediction component.</p>
-<!-- Additional clinical-related content can be added here -->
+<p>Please input the clinical parameters below. If you leave any field empty, the default value will be used.</p>
+<form method="POST">
+  {% for col in columns %}
+  <div class="form-group">
+    <label for="{{ col }}">{{ col }}</label>
+    <input type="text" class="form-control" id="{{ col }}" name="{{ col }}" value="{{ defaults[col] }}">
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% if result %}
+<div class="mt-4">
+  {{ result|safe }}
+</div>
+{% endif %}
 {% endblock %}

@@ -1,22 +1,38 @@
-/* Basic styles for sidebar and chat box */
+/* Import a clean, professional font */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+/*--------------------------------------------------------------
+# Base Styles
+--------------------------------------------------------------*/
 body {
+  font-family: 'Open Sans', sans-serif;
+  background-color: #f5f9fc; /* Light clinical background */
+  color: #333;
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
+/*--------------------------------------------------------------
+# Layout Wrapper
+--------------------------------------------------------------*/
 #wrapper {
   display: flex;
 }
 
-/* Sidebar styles */
+/*--------------------------------------------------------------
+# Sidebar Styles
+--------------------------------------------------------------*/
 #sidebar-wrapper {
   min-height: 100vh;
   width: 250px;
-  background: #f8f9fa;
+  background: #e0f7fa; /* Soft blue/teal tone for a medical feel */
   position: fixed;
   left: 0;
   top: 0;
   overflow-y: auto;
   transition: all 0.3s ease;
+  border-right: 1px solid #ccc;
 }
 
 /* Hide sidebar when toggled */
@@ -24,41 +40,50 @@ body {
   margin-left: -250px;
 }
 
-/* Content wrapper shifts when sidebar toggles */
+/*--------------------------------------------------------------
+# Content Area Styles
+--------------------------------------------------------------*/
 #page-content-wrapper {
   width: 100%;
   margin-left: 250px;
   transition: all 0.3s ease;
+  padding: 20px; /* Added padding for breathing room */
 }
 
-/* Shift back when sidebar is hidden */
+/* Shift content when sidebar is hidden */
 #wrapper.toggled #page-content-wrapper {
   margin-left: 0;
 }
 
-/* Sidebar menu styling */
+/*--------------------------------------------------------------
+# Sidebar Menu Styling
+--------------------------------------------------------------*/
 .sidebar-nav {
   padding: 0;
+  margin: 0;
   list-style: none;
 }
 
 .sidebar-nav li {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+  padding: 10px 15px;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .sidebar-nav li a {
   text-decoration: none;
-  color: #333;
+  color: #007bff; /* Bootstrap primary blue */
   display: block;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebar-nav li a:hover {
   background: #007bff;
-  color: white;
+  color: #fff;
 }
 
-/* Chat box styling (Fixed so it is not affected by sidebar toggle) */
+/*--------------------------------------------------------------
+# Chat Box Styling
+--------------------------------------------------------------*/
 .chat-box {
   position: fixed;
   bottom: 20px;
@@ -66,23 +91,36 @@ body {
   width: 300px;
   background: #ffffff;
   border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
   z-index: 1000;
+  border-radius: 5px;
 }
+
+/* Chat header with a vibrant blue background */
 .chat-header {
   background: #007bff;
   color: #fff;
-  padding: 10px;
+  padding: 10px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
+
+/* Chat body for messages */
 .chat-body {
   height: 200px;
   overflow-y: auto;
-  padding: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
 }
+
+/* Chat footer styling */
 .chat-footer {
-  padding: 10px;
+  padding: 10px 15px;
+  border-top: 1px solid #dee2e6;
+  background-color: #e9ecef;
 }
