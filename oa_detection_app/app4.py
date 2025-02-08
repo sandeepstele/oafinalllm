@@ -20,7 +20,7 @@ openai.api_key = ""
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
 app = Flask(__name__)
-app.secret_key = '1d908d65917a170b06ca8f23bfe07b8ce6a4197a25a7722ff0dbd0b00929b0a6'
+app.secret_key = ''
 
 # ----- Define file paths for the FAISS index and document chunks -----
 INDEX_FILE = "faiss_index.bin"
