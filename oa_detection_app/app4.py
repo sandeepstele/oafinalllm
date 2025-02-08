@@ -1,7 +1,4 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()  # Load environment variables at the very start
-
+import os 
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image as keras_image
 import numpy as np
@@ -10,25 +7,42 @@ import joblib
 import xgboost
 from sklearn.preprocessing import PolynomialFeatures
 import sklearn.metrics._scorer
-if not hasattr(sklearn.metrics._scorer, '_passthrough_scorer'):
-    sklearn.metrics._scorer._passthrough_scorer = lambda *args, **kwargs: None
 from io import BytesIO
 import json
 import faiss
 import openai
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-
+if not hasattr(sklearn.metrics._scorer, '_passthrough_scorer'):
+    sklearn.metrics._scorer._passthrough_scorer = lambda *args, **kwargs: None
 # Set up the OpenAI client with environment variables or hard-coded values for testing.
 # For testing, we hard-code the token; in production, use environment variables.
 openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBhcmFkb3hAc3R1ZHkuaWl0bS5hYy5pbiJ9.YSy04n-k8bspy7aoR3eMxkBS2JWkMq91qJiF-2Op-vg"
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure key
+app.secret_key = '1d908d65917a170b06ca8f23bfe07b8ce6a4197a25a7722ff0dbd0b00929b0a6'
 
 # ----- Define file paths for the FAISS index and document chunks -----
 INDEX_FILE = "faiss_index.bin"
 CHUNKS_FILE = "document_chunks.json"
+
+# ----- Load your models (they already exist in the models folder) -----
+multi_tf_model = tf.keras.models.load_model(os.path.join('models', 'weightsfinal.h5'))
+multi_xgb_model = joblib.load(os.path.join('models', 'xgb_clf_model_multi.pkl'))
+binary_tf_model = tf.keras.models.load_model(os.path.join('models', 'weightb.h5'))
+binary_xgb_model = joblib.load(os.path.join('models', 'xgb_classifier.pkl'))
+
+# ----- Load default details for OA and KL levels -----
+DEFAULT_FILE_PATH = os.path.join("default.txt")
+try:
+    with open(DEFAULT_FILE_PATH, 'r') as f:
+        default_details = f.read()
+except Exception as e:
+    default_details = "Default OA/KL level details not available."
+# Define file paths for the report rules index.
+REPORT_RULES_FILE = "report_rules.txt"      # (The source document for report rules)
+REPORT_INDEX_FILE = "report_index.bin"        # (The FAISS index file built separately)
+REPORT_CHUNKS_FILE = "report_chunks.json"     # (The JSON file containing the report rules chunks)
 
 # Global variables for FAISS index and cached chunks.
 faiss_index = None
@@ -87,14 +101,10 @@ def rag_chat(query):
         app.logger.error(f"Error in rag_chat: {e}", exc_info=True)
         return f"Error in rag_chat: {e}"
 
-# ----- Load your models (they already exist in the models folder) -----
-multi_tf_model = tf.keras.models.load_model(os.path.join('models', 'weightsfinal.h5'))
-multi_xgb_model = joblib.load(os.path.join('models', 'xgb_clf_model_multi.pkl'))
-binary_tf_model = tf.keras.models.load_model(os.path.join('models', 'weightb.h5'))
-binary_xgb_model = joblib.load(os.path.join('models', 'xgb_classifier.pkl'))
+
 
 # ----- Default Clinical Data & Preprocessing -----
-default_sample_data = np.array([[59, 181.1, 78.1, 90.9, 23.8, 5, 1, 5, 3, 0, 0, 1, 1, 100, 2, 3, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 0, 0]])
+default_sample_data = np.array([ [56, 183.15, 123.5, 129.5, 36.8, 2, 1, 2, 0, 0, 2, 0, 1, 66.7, 2, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]])
 clinical_columns = [
     "AGE", "HEIGHT", "WEIGHT", "MAX WEIGHT", "BMI", "FREQUENT PAIN", "SURGERY",
     "RISK", "SXKOA", "SWELLING", "BENDING FULLY", "SYMPTOMATIC", "CREPITUS",
@@ -120,17 +130,6 @@ def preprocess_image_file(img_file):
     img_array = np.expand_dims(img_array, axis=0)
     return img_array
 
-# ----- Load default details for OA and KL levels -----
-DEFAULT_FILE_PATH = os.path.join("default.txt")
-try:
-    with open(DEFAULT_FILE_PATH, 'r') as f:
-        default_details = f.read()
-except Exception as e:
-    default_details = "Default OA/KL level details not available."
-# Define file paths for the report rules index.
-REPORT_RULES_FILE = "report_rules.txt"      # (The source document for report rules)
-REPORT_INDEX_FILE = "report_index.bin"        # (The FAISS index file built separately)
-REPORT_CHUNKS_FILE = "report_chunks.json"     # (The JSON file containing the report rules chunks)
 
 # Global variables for the report rules FAISS index and cached chunks.
 report_index = None
@@ -339,7 +338,7 @@ def chat():
         try:
             # If you want to use RAG, comment out the simple chat below and uncomment the RAG call.
             # Simple Chat:
-            # chat_response = openai.ChatCompletion.create(
+            # chat_response = openai.ChatCompletion.create(c
             #     model="gpt-4o-mini",
             #     messages=[{"role": "user", "content": user_message}],
             #     temperature=0.7

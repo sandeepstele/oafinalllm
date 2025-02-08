@@ -15,7 +15,7 @@ import openai
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, request
 
-openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIyZjIwMDE0NDdAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9._NZRQhxfqSjUJMWcKcfht63t0G35hRFbScM006IYz_M"
+openai.api_key = ""
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a secure key

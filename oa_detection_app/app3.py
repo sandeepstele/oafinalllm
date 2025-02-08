@@ -20,7 +20,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 
 # Set up the OpenAI client with environment variables or hard-coded values for testing.
 # For testing, we hard-code the token; in production, use environment variables.
-openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBhcmFkb3hAc3R1ZHkuaWl0bS5hYy5pbiJ9.YSy04n-k8bspy7aoR3eMxkBS2JWkMq91qJiF-2Op-vg"
+openai.api_key = ""
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
 app = Flask(__name__)
