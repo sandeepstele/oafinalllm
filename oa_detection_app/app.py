@@ -11,12 +11,15 @@ from io import BytesIO
 import json
 import faiss
 import openai
+import os
+from dotenv import load_dotenv
+load_dotenv() 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 if not hasattr(sklearn.metrics._scorer, '_passthrough_scorer'):
     sklearn.metrics._scorer._passthrough_scorer = lambda *args, **kwargs: None
 # Set up the OpenAI client with environment variables or hard-coded values for testing.
 # For testing, we hard-code the token; in production, use environment variables.
-openai.api_key = ""
+openai.api_key = os.getenv('AIPROXY_TOKEN')
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
 app = Flask(__name__)
