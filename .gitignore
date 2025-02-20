@@ -9,3 +9,4 @@ oa_detection_app/app3.py
 oa_detection_app/app1.py
 .env
 oa_detection_app/templates/fusion.html
+oa_detection_app/templates/fusion_results_pdf.html

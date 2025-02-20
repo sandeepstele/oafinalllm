@@ -3,18 +3,47 @@
 {% block content %}
 <h1>Fusion Model Results</h1>
 
-<div class="fusion-results">
+<div class="fusion-results" id="report-content">
   <h2>Predictions and Clinical Data</h2>
   <div>
     {{ fusion_result|safe }}
   </div>
+
+  <div class="patient-report">
+    <h2>Patient Report</h2>
+    <p>{{ patient_report|replace("\n", "<br>")|markdown_to_html|safe }}</p>
+  </div>
 </div>
 
-<div class="patient-report">
-  <h2>Patient Report</h2>
-  <!-- Convert newlines to <br> and apply our custom markdown filter for bold text -->
-  <p>{{ patient_report|replace("\n", "<br>")|markdown_to_html|safe }}</p>
-</div>
+<!-- Print button triggers the browser print dialog -->
+<button onclick="window.print()" class="btn btn-secondary mt-3">Print Report</button>
 
-<a href="{{ url_for('fusion') }}" class="btn btn-secondary mt-3">Back to Input</a>
+<!-- Download button triggers client-side PDF generation -->
+<button id="download-pdf" class="btn btn-primary mt-3">Download as PDF</button>
+
+<!-- Include jsPDF library -->
+ <!-- Include html2canvas from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- Include jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  document.getElementById("download-pdf").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+    var doc = new jsPDF('p', 'pt', 'a4');
+    var content = document.getElementById("report-content");
+    
+    // Use the html() method to render the report content into the PDF
+    doc.html(content, {
+      callback: function (doc) {
+        doc.save("patient_report.pdf");
+      },
+      x: 20,
+      y: 20,
+      width: 555,  // Adjust width as needed
+      windowWidth: content.scrollWidth
+    });
+  });
+</script>
 {% endblock %}

@@ -11,14 +11,16 @@ from io import BytesIO
 import json
 import faiss
 import openai
+import pdfkit
 import os
 from dotenv import load_dotenv
 load_dotenv() 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
 if not hasattr(sklearn.metrics._scorer, '_passthrough_scorer'):
     sklearn.metrics._scorer._passthrough_scorer = lambda *args, **kwargs: None
+    
 # Set up the OpenAI client with environment variables or hard-coded values for testing.
-# For testing, we hard-code the token; in production, use environment variables.
+
 openai.api_key = os.getenv('AIPROXY_TOKEN')
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
@@ -270,7 +272,16 @@ def fusion():
                 except ValueError:
                     clinical_inputs.append(default_clinical_dict[col])
         clinical_array = np.array([clinical_inputs])
+        # Full dataframe for prediction (includes polynomial features)
         processed_df = preprocess_clinical_data(clinical_array)
+        
+        # Exclude these columns from the display
+        excluded_cols = ["osfl", "scfl", "cyfl", "ostm", "sctm", "cytm",
+                         "attm", "osfm", "scfm", "cyfm", "ostl", "sctl", "cytl", "attl"]
+        # Create a display dataframe with only the original clinical columns that are not excluded
+        display_columns = [col for col in clinical_columns if col not in excluded_cols]
+        display_df = pd.DataFrame(clinical_array, columns=clinical_columns)[display_columns]
+        
         if 'image_file' not in request.files:
             flash("No image file provided.")
             return redirect(request.url)
@@ -303,7 +314,7 @@ def fusion():
         
         fusion_result = (
             "Processed Clinical Data:<br>" +
-            processed_df.to_html(classes="table table-bordered") +
+            display_df.to_html(classes="table table-bordered") +
             "<br><br>" +
             f"Multi-class Prediction: {multi_result}" +
             "<br>" +
@@ -322,14 +333,12 @@ def fusion():
         patient_report = rag_report_from_rules(report_query)
         app.logger.info("Patient Report: %s", patient_report)
         
-        
         return render_template('fusion_results.html',
                                fusion_result=fusion_result,
                                patient_report=patient_report,
                                defaults=default_clinical_dict,
                                columns=clinical_columns)
     return render_template('fusion_input.html', defaults=default_clinical_dict, columns=clinical_columns)
-
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
     response_text = ""
@@ -363,6 +372,32 @@ def chat():
     
     app.logger.debug("Rendering chat.html template with response.")
     return render_template('chat.html', response=response_text, user_message=user_message)
+@app.route('/download_report', methods=['POST'])
+def download_report():
+    """
+    This endpoint generates a PDF report on the server side.
+    It expects the fusion_result and patient_report to be passed via a POST form.
+    """
+    fusion_result = request.form.get('fusion_result', '')
+    patient_report = request.form.get('patient_report', '')
+    
+    # Render a template specifically for the PDF report.
+    # You can create a dedicated template (e.g., fusion_results_pdf.html) that formats the report for PDF.
+    rendered = render_template('fusion_results_pdf.html',
+                               fusion_result=fusion_result,
+                               patient_report=patient_report)
+    
+    try:
+        # Generate PDF from the rendered HTML. The second parameter 'False' tells pdfkit to return the PDF as a byte string.
+        pdf = pdfkit.from_string(rendered, False)
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=patient_report.pdf'
+        return response
+    except Exception as e:
+        app.logger.error("Error generating PDF: %s", e, exc_info=True)
+        flash("There was an error generating the PDF.")
+        return redirect(url_for('fusion'))
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
