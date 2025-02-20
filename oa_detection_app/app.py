@@ -320,6 +320,8 @@ def fusion():
             "Provide a concise summary report including interpretation and risk of OA."
         )
         patient_report = rag_report_from_rules(report_query)
+        app.logger.info("Patient Report: %s", patient_report)
+        
         
         return render_template('fusion_results.html',
                                fusion_result=fusion_result,

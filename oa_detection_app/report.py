@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Set up the OpenAI client (use your proxy token and API base)
-openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBhcmFkb3hAc3R1ZHkuaWl0bS5hYy5pbiJ9.YSy04n-k8bspy7aoR3eMxkBS2JWkMq91qJiF-2Op-vg"
+openai.api_key = os.getenv('AIPROXY_TOKEN')
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1" 
 
 # Define file paths for the report rules document and index files.

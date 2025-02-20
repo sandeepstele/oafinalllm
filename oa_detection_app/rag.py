@@ -5,7 +5,7 @@ import faiss
 import openai
 
 # Make sure your OpenAI credentials are set up (hard-coded for testing, but ideally use environment variables)
-openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIyZjIwMDE0NDdAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9._NZRQhxfqSjUJMWcKcfht63t0G35hRFbScM006IYz_M"
+openai.api_key = os.getenv('AIPROXY_TOKEN')
 openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
 
 # Path to your document
