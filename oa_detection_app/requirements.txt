@@ -25,3 +25,4 @@ uvicorn  # ASGI server for FastAPI
 
 # Optional: Streamlit (If you want a UI for interaction)
 streamlit  # Interactive web UI for AI applications
+dotenv  # Environment variable management for Streamlit
