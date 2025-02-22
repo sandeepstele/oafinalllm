@@ -124,6 +124,8 @@ body {
   border-top: 1px solid #dee2e6;
   background-color: #e9ecef;
 }
+
+/* Adjust font size and table layout for better display */
 .fusion-results, .patient-report {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
@@ -132,8 +134,18 @@ body {
   border-radius: 5px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 1.6;
+  font-size: 14px; /* Reduced font size */
+  overflow-x: auto;
 }
 
 .patient-report h2 {
   color: #2c3e50;
+}
+
+.table {
+  font-size: 12px; /* Reduce table font size */
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
 }
