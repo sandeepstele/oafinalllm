@@ -109,7 +109,7 @@ def rag_chat(query):
 
 
 # ----- Default Clinical Data & Preprocessing -----
-default_sample_data = np.array([ [56, 183.15, 123.5, 129.5, 36.8, 2, 1, 2, 0, 0, 2, 0, 1, 66.7, 2, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]])
+default_sample_data = np.array([ [52,164.8,77.7,79.5,28.6,1,1,2,0,0,0,0,1,100,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]])
 clinical_columns = [
     "AGE", "HEIGHT", "WEIGHT", "MAX WEIGHT", "BMI", "FREQUENT PAIN", "SURGERY",
     "RISK", "SXKOA", "SWELLING", "BENDING FULLY", "SYMPTOMATIC", "CREPITUS",
