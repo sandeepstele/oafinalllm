@@ -6,7 +6,9 @@
 <div class="fusion-results" id="report-content">
   <h2>Predictions and Clinical Data</h2>
   <div>
-    {{ fusion_result|safe }}
+    <span style="font-weight: bold; font-size: 1.5em;">
+      {{ fusion_result|safe }}
+    </span>
   </div>
 
   <div class="patient-report">
@@ -21,12 +23,8 @@
 <!-- Download button triggers client-side PDF generation -->
 <button id="download-pdf" class="btn btn-primary mt-3">Download as PDF</button>
 
-<!-- Include jsPDF library -->
- <!-- Include html2canvas from CDN -->
+<!-- Include html2canvas and jsPDF libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<!-- Include jsPDF library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   document.getElementById("download-pdf").addEventListener("click", function () {

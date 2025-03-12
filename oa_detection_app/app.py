@@ -306,8 +306,9 @@ def fusion():
         # Binary predictions
         predictions_tf_binary = binary_tf_model.predict(img_array)
         xgb_probs_binary = binary_xgb_model.predict_proba(processed_df.values)
-        w1_binary = 0.4897959183673469
-        w2_binary = 0.5102040816326531
+        w1_binary = 0.5102040816326531
+        w2_binary = 0.4897959183673469
+        
         fused_probs_binary = (w1_binary * predictions_tf_binary) + (w2_binary * xgb_probs_binary)
         final_label_binary = np.argmax(fused_probs_binary, axis=1)[0]
         binary_result = f"OA Detection = {'Yes (1)' if final_label_binary == 1 else 'No (0)'}."
